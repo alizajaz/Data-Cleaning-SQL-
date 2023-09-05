@@ -117,3 +117,80 @@ SET OwnerSplitState = PARSENAME(REPLACE(OwnerAddress, ',', '.') , 1)
 
 Select *
 From PortfolioProject.dbo.NashvilleHousing
+
+
+
+
+------------------------------------------------------------------------------------------------
+--CHANGE Y AND N TO YES AND NO IN "SoldAsVacant" FIELD
+ SELECT DISTINCT(SoldAsVacant),Count(SoldAsVacant)
+ FROM PortfolioProject.dbo.NashvilleHousing
+ GROUP BY SoldAsVacant
+ ORDER BY 2 
+
+
+
+SELECT SoldAsVacant
+, CASE WHEN SoldAsVacant='Y' THEN 'Yes'
+	 WHEN SoldAsVacant='N' THEN 'No'
+	 ELSE SoldAsVacant
+	 END
+
+ FROM PortfolioProject.dbo.NashvilleHousing
+
+
+ UPDATE NashvilleHousing
+ SET SoldAsVacant = CASE WHEN SoldAsVacant='Y' THEN 'Yes'
+	 WHEN SoldAsVacant='N' THEN 'No'
+	 ELSE SoldAsVacant
+	 END
+
+---------------------------------------------------------------------------------------------
+
+
+-- REMOVE DUPLICATE
+	WITH RowNumCTE AS(
+	SELECT *,
+	ROW_NUMBER() OVER (
+	PARTITION BY 
+	ParcelID,
+	PropertyAddress,
+	SaleDate,
+	LegalReference
+	ORDER BY
+	UniqueID
+	) row_num
+	 
+
+	FROM PortfolioProject.dbo.NashvilleHousing
+	--ORDER BY ParcelID
+	)
+
+	SELECT *
+	FROM RowNumCTE
+	WHERE row_num >1
+	--ORDER BY PropertyAddress
+
+
+SELECT *
+From PortfolioProject.dbo.NashvilleHousing
+
+
+
+
+-DELETE UNUSED COLUMNS
+
+SELECT *
+From PortfolioProject.dbo.NashvilleHousing
+
+ALTER TABLE PortfolioProject.dbo.NashvilleHousing
+DROP COLUMN OwnerAddress,TaxDistrict, PropertyAddress
+
+ALTER TABLE PortfolioProject.dbo.NashvilleHousing
+DROP COLUMN SaleDate
+
+
+
+
+
+----------------------------------------------------------------------------------------------
